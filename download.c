@@ -146,6 +146,14 @@ int main(int argc, char *argv[]) {
 
 	//==================================================================================================
 	// Exit
+	receiveData(sockfd, buf);
+	
+	memset(buf, 0, MAX_DATA_SIZE);
+	strcpy(buf, "QUIT");
+	sendData(sockfd, buf);
+
+	receiveData(sockfd, buf);
+
 	close(new_sockfd);
 	close(sockfd);
 	exit(0);
@@ -221,13 +229,12 @@ int saveFile(int sockfd, char *path) {
 	printf("\nFile %s created\n", name);
 	int n;
 	char buf[MAX_DATA_SIZE];
+	printf("Downloading...\n");
 	while((n = recv(sockfd, buf, MAX_DATA_SIZE, 0)) != 0) {
 		write(file, buf, n);
 	}
 
-	printf("\nFinished writing to file\n");
+	printf("Finished writing to file\n\n");
 	close(file);
 	return 0;
 }
-
-
