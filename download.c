@@ -25,7 +25,7 @@ Adopts URL syntax, as described in RFC1738
 
 void printUsage();
 int receiveData(int sockfd, char *buf);
-int sendData(int sockfd, char *msg);
+int sendData(int sockfd, char *cmd, char *arg);
 int connectSocket(char *ip, int port);
 int saveFile(int sockfd, char *buf);
 
@@ -90,25 +90,19 @@ int main(int argc, char *argv[]) {
 
 	//==================================================================================================
 	// Login
-	memset(buf, 0, MAX_DATA_SIZE); // User
-	strcpy(buf, "USER ");
-	strcat(buf, user);
-	sendData(sockfd, buf);
+	// User
+	sendData(sockfd, "USER ", user);
 	receiveData(sockfd, buf);
 
-	memset(buf, 0, MAX_DATA_SIZE); // Password
-	strcpy(buf, "PASS ");
-	strcat(buf, password);
-	sendData(sockfd, buf);
+	// Password
+	sendData(sockfd, "PASS ", password);
 	receiveData(sockfd, buf);
 
 
 
 	//==================================================================================================
 	// Enter passive mode
-	memset(buf, 0, MAX_DATA_SIZE);
-	strcpy(buf, "PASV ");
-	sendData(sockfd, buf);
+	sendData(sockfd, "PASV ", "");
 	receiveData(sockfd, buf);
 
 
@@ -132,10 +126,7 @@ int main(int argc, char *argv[]) {
 
 	//==================================================================================================
 	// Download
-	memset(buf, 0, MAX_DATA_SIZE);
-	strcpy(buf, "RETR ");
-	strcat(buf, path);
-	sendData(sockfd, buf);
+	sendData(sockfd, "RETR ", path);
 
 	receiveData(sockfd, buf);
 
@@ -148,9 +139,7 @@ int main(int argc, char *argv[]) {
 	// Exit
 	receiveData(sockfd, buf);
 	
-	memset(buf, 0, MAX_DATA_SIZE);
-	strcpy(buf, "QUIT");
-	sendData(sockfd, buf);
+	sendData(sockfd, "QUIT", "");
 
 	receiveData(sockfd, buf);
 
@@ -178,7 +167,11 @@ int receiveData(int sockfd, char *buf) {
 	return 0;	
 }
 
-int sendData(int sockfd, char *buf) {
+int sendData(int sockfd, char *cmd, char *arg) {
+	char buf[MAX_DATA_SIZE];
+	memset(buf, 0, MAX_DATA_SIZE);
+	strcpy(buf, cmd);
+	strcat(buf, arg);
 	strcat(buf, "\r\n");
 	send(sockfd, buf, strlen(buf), 0);
 	printf("\nSent: %s", buf);
