@@ -162,6 +162,11 @@ int receiveData(int sockfd, char *buf) {
 	recv(sockfd, buf, MAX_DATA_SIZE, 0);
 	printf("Received: %s", buf);
 
+	if (buf[0] == '5') {
+		printf("\nTerminated\n");
+		exit(8);
+	}
+
 	return 0;	
 }
 
